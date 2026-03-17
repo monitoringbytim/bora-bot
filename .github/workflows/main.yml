@@ -2,7 +2,7 @@ name: BORA Monitor
 
 on:
   schedule:
-    - cron: '*/10 * * * *'  # 10분마다 실행 (GitHub 무료 정책상 5~10분이 최소 단위입니다)
+    - cron: '*/5 * * * *'  # 5분마다 실행 (GitHub 무료 정책상 5~10분이 최소 단위입니다)
   workflow_dispatch: # 수동으로 실행해볼 때 사용
 
 jobs:
