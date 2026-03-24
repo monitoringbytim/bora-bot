@@ -39,8 +39,8 @@ try:
     total_depth = b_usd + a_usd
 
     # 알림 조건 체크
-    condition_1 = (a_usd <= 5000) or (b_usd <= 5000)
-    condition_2 = (total_depth <= 12500)
+    condition_1 = (a_usd <= 1500) or (b_usd <= 1500)
+    condition_2 = (total_depth <= 5000)
 
     # 테스트를 원하시면 아래 if 문을 무시하고 무조건 발송하게 코드를 짤 수 있으나, 
     # 일단은 요청하신 조건문 로직을 유지합니다.
