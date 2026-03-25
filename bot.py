@@ -46,8 +46,8 @@ try:
     # 일단은 요청하신 조건문 로직을 유지합니다.
     if condition_1 or condition_2:
         reason = ""
-        if condition_1: reason += "⚠️ 한쪽 유동성 5,000$ 미만 발생!\n"
-        if condition_2: reason += "📉 합산 유동성 12,500$ 미만 발생!\n"
+        if condition_1: reason += "⚠️ 한쪽 유동성 1,500$ 미만 발생!\n"
+        if condition_2: reason += "📉 합산 유동성 5,000$ 미만 발생!\n"
 
         msg = (f"‼️ [BORA 유동성 경고]\n\n"
                f"{reason}\n"
