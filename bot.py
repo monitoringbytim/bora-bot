@@ -1,6 +1,6 @@
 import requests
 import os
-import time  # 시간 표시를 위해 필요
+import time
 
 # GitHub Secrets에서 정보 가져오기
 TELEGRAM_TOKEN = os.environ["TELEGRAM_TOKEN"]
@@ -33,35 +33,39 @@ def send_telegram(message):
     except Exception as e:
         print(f"텔레그램 전송 실패: {e}")
 
-# --- 실행 구간 (GitHub Actions는 1회 실행 방식입니다) ---
+# --- 실행 구간 ---
 try:
     price, b_usd, a_usd = get_depth()
     total_depth = b_usd + a_usd
 
-    # 알림 조건 체크
-    condition_1 = (a_usd <= 1500) or (b_usd <= 1500)
-    condition_2 = (total_depth <= 5000)
+    # [요청사항 반영] 알림 조건 수치 수정
+    condition_1 = (a_usd <= 5000) or (b_usd <= 5000)  # 한쪽 5,000$ 이하
+    condition_2 = (total_depth <= 10000)             # 합산 10,000$ 이하
 
-    # 테스트를 원하시면 아래 if 문을 무시하고 무조건 발송하게 코드를 짤 수 있으나, 
-    # 일단은 요청하신 조건문 로직을 유지합니다.
+    # 메시지 제목 설정
     if condition_1 or condition_2:
-        reason = ""
-        if condition_1: reason += "⚠️ 한쪽 유동성 1,500$ 미만 발생!\n"
-        if condition_2: reason += "📉 합산 유동성 5,000$ 미만 발생!\n"
-
-        msg = (f"‼️ [BORA 유동성 경고]\n\n"
-               f"{reason}\n"
-               f"📍 현재가: ${price}\n"
-               f"💰 +2% Depth: ${round(a_usd, 2):,}\n"
-               f"💰 -2% Depth: ${round(b_usd, 2):,}\n"
-               f"📊 합산 유동성: ${round(total_depth, 2):,}\n"
-               f"⏰ 발생시각: {time.strftime('%Y-%m-%d %H:%M:%S')}")
-
-        send_telegram(msg)
-        print(f"🚨 경고 전송 완료 ({time.strftime('%H:%M:%S')})")
+        header = "🚨 [BORA 유동성 위험 경고]"
+        reason = "⚠️ 유동성 부족 상태가 감지되었습니다!\n"
+        if condition_1: reason += "- 한쪽 유동성 5,000$ 미만\n"
+        if condition_2: reason += "- 합산 유동성 10,000$ 미만\n"
     else:
-        print(f"✅ 정상 상태: 합계 ${round(total_depth, 0)} (알림 미발송)")
+        header = "📊 [BORA 유동성 정기 보고]"
+        reason = "✅ 현재 유동성은 설정 기준치 이상입니다.\n"
+
+    # 메시지 구성 (조건 상관없이 상세 수치는 항상 포함)
+    msg = (f"{header}\n\n"
+           f"{reason}\n"
+           f"📍 현재가: ${price}\n"
+           f"💰 +2% Depth: ${round(a_usd, 2):,}\n"
+           f"💰 -2% Depth: ${round(b_usd, 2):,}\n"
+           f"📊 합산 유동성: ${round(total_depth, 2):,}\n"
+           f"--------------------------\n"
+           f"⏰ 확인시각(KST): {time.strftime('%Y-%m-%d %H:%M:%S')}")
+
+    # [요청사항 반영] 조건문 없이 '무조건' 전송
+    send_telegram(msg)
+    print(f"✅ 리포트 전송 완료 ({time.strftime('%H:%M:%S')})")
 
 except Exception as e:
     print(f"오류 발생: {e}")
-    exit(1) # 오류 발생 시 GitHub Actions에 에러 알림
+    exit(1)
