@@ -1,0 +1,29 @@
+name: Keepalive Bot Scheduler
+
+on:
+  schedule:
+    # 매달 1일 00:00(UTC)에 자동으로 실행 (60일 제한 방지)
+    - cron: '0 0 1 * *'
+  workflow_dispatch: # 필요할 때 수동으로도 실행 가능
+
+jobs:
+  keepalive:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # GitHub Actions가 커밋을 밀어 넣을 수 있도록 권한 부여
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Create Dummy Commit
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          
+          # keepalive.txt 파일에 현재 시간을 기록하여 변경사항 생성
+          echo "Last active: $(date)" > keepalive.txt
+          
+          git add keepalive.txt
+          git commit -m "chore: GitHub Actions 활성화 유지를 위한 정기 더미 커밋" || exit 0
+          git push
